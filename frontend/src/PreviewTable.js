@@ -2,46 +2,46 @@ import React from "react";
 
 function PreviewTable({ data, onCellChange }) {
 
-if(!data || data.length === 0){
-return <p>No preview available</p>
-}
+    if (!data || data.length === 0) {
+        return <p>No preview available</p>
+    }
 
-return(
+    return (
 
-<table>
+        <table>
 
-<thead>
-<tr>
-{Object.keys(data[0]).map((key)=>(
-<th key={key}>{key}</th>
-))}
-</tr>
-</thead>
+            <thead>
+                <tr>
+                    {Object.keys(data[0]).map((key) => (
+                        <th key={key}>{key}</th>
+                    ))}
+                </tr>
+            </thead>
 
-<tbody>
+            <tbody>
 
-{data.map((row,i)=>(
-<tr key={i}>
+                {data.map((row, i) => (
+                    <tr key={i}>
 
-{Object.entries(row).map(([key,value])=>(
-<td key={key}>
-<input
-type="text"
-value={value || ""}
-onChange={(e)=> onCellChange(i, key, e.target.value)}
-className="table-input"
-/>
-</td>
-))}
+                        {Object.entries(row).map(([key, value]) => (
+                            <td key={key}>
+                                <input
+                                    type="text"
+                                    value={value || ""}
+                                    onChange={(e) => onCellChange(i, key, e.target.value)}
+                                    className="table-input"
+                                />
+                            </td>
+                        ))}
 
-</tr>
-))}
+                    </tr>
+                ))}
 
-</tbody>
+            </tbody>
 
-</table>
+        </table>
 
-)
+    )
 
 }
 

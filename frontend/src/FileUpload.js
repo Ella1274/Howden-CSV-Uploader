@@ -46,7 +46,7 @@ function FileUpload() {
     return errors;
   };
 
-  // Handles cell edit in table
+  // Handle cell edits
   const handleCellChange = (table, rowIndex, key, value) => {
     if (table === "loc") {
       const updated = [...locPreview];
@@ -61,102 +61,92 @@ function FileUpload() {
 
   // Submit data
   const handleSubmit = async () => {
-
     console.log("Submit clicked");
 
-  const errors = validateLocData(locPreview);
+    const errors = validateLocData(locPreview);
 
-  if (errors.length > 0) {
-    setPopup({ message: errors.join("\n"), type: "error" });
-    setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
-    return;
-  }
+    if (errors.length > 0) {
+      setPopup({ message: errors.join("\n"), type: "error" });
+      setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
+      return;
+    }
 
-  if (!portfolio) {
-    setPopup({ message: "Please fill the portfolio name.", type: "error" });
-    setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
-    return;
-  }
+    if (!portfolio) {
+      setPopup({ message: "Please fill the portfolio name.", type: "error" });
+      setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
+      return;
+    }
 
-  // Remove empty rows that PapaParse sometimes creates
-  const cleanedLoc = locPreview.filter(row => Object.values(row).some(v => v !== ""));
-  const cleanedAcc = accPreview.filter(row => Object.values(row).some(v => v !== ""));
+    // Remove empty rows
+    const cleanedLoc = locPreview.filter(row => Object.values(row).some(v => v !== ""));
+    const cleanedAcc = accPreview.filter(row => Object.values(row).some(v => v !== ""));
 
-  try {
+    try {
+      const res = await axios.post("http://localhost:8000/upload_json", {
+        portfolio_name: portfolio,
+        loc_data: cleanedLoc,
+        acc_data: cleanedAcc
+      });
 
-    console.log("Sending data:", {
-      portfolio_name: portfolio,
-      loc_data: cleanedLoc,
-      acc_data: cleanedAcc
-    });
+      if (res.data.status === "error") {
+        setPopup({
+          message: `Upload failed: ${res.data.errors ? res.data.errors.join(", ") : res.data.message}`,
+          type: "error"
+        });
+      } else {
+        setPopup({
+          message: `Upload successful! Portfolio: ${res.data.portfolio}`,
+          type: "success"
+        });
+      }
 
-    const res = await axios.post("http://localhost:8000/upload_json", {
-      portfolio_name: portfolio,
-      loc_data: cleanedLoc,
-      acc_data: cleanedAcc
-    });
+      setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
+    } catch (err) {
+      console.error("Upload error:", err);
+      setPopup({
+        message: "Upload failed. Please try again.",
+        type: "error"
+      });
+      setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
+    }
+  };
 
-    console.log("Backend response:", res.data);
+  // Editable table component – **must be defined here, not inside handleSubmit**
+  const EditableTable = ({ data, tableType }) => {
+    if (!data || data.length === 0) return <p>No preview available</p>;
 
-    const returnedPortfolio =
-      res.data.portfolio || res.data.portfolio_name || portfolio;
-
-    setPopup({
-      message: `Upload successful! Portfolio: ${returnedPortfolio}`,
-      type: "success"
-    });
-
-    setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
-
-  } catch (err) {
-
-    console.error("Upload error:", err);
-
-    setPopup({
-      message: "Upload failed. Please try again.",
-      type: "error"
-    });
-
-    setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
-  }
-};
-
-  // Editable table component
-const EditableTable = ({ data, tableType }) => {
-  if (!data || data.length === 0) return <p>No preview available</p>;
-
-  return (
-    <table border="1">
-      <thead>
-        <tr>
-          {Object.keys(data[0]).map((key) => (
-            <th key={key}>{key}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {Object.entries(row).map(([key, value], colIndex) => (
-              <td key={colIndex}>
-                <input
-                  type="text"
-                  defaultValue={value || ""}
-                  onBlur={(e) => handleCellChange(tableType, rowIndex, key, e.target.value)}
-                  style={{ width: "100%", border: "none", background: "transparent" }}
-                />
-              </td>
+    return (
+      <table border="1">
+        <thead>
+          <tr>
+            {Object.keys(data[0]).map((key) => (
+              <th key={key}>{key}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {Object.entries(row).map(([key, value], colIndex) => (
+                <td key={colIndex}>
+                  <input
+                    type="text"
+                    defaultValue={value || ""}
+                    onBlur={(e) => handleCellChange(tableType, rowIndex, key, e.target.value)}
+                    style={{ width: "100%", border: "none", background: "transparent" }}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
 
+  // Return JSX
   return (
     <div className="page-container">
-      {/* Popup */}
       {popup.message && (
         <div className={`popup-message ${popup.type}`}>
           {popup.message}
