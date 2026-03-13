@@ -1,6 +1,6 @@
 # Howden-CSV-Uploader
 
-Small web application allowing users to upload two CSV files and validate them.
+Small web application allowing users to upload, preview and edit two CSV files and validate them.
 
 ## Tech Stack
 
