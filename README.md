@@ -19,7 +19,13 @@ Backend
 
 cd backend
 
-python -m venv venv
+Delete venv 
+
+Create new venv:
+py -3.12 -m venv venv
+
+May need to bypss using:  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
 source venv/scripts/activate
 
 pip install -r requirements.txt
@@ -34,6 +40,8 @@ http://127.0.0.1:8000
 ### Frontend
 
 cd frontend
+
+May need to Bypass using:  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 npm install
 
