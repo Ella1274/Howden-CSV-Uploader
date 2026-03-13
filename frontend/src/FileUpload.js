@@ -37,6 +37,9 @@ function FileUpload() {
       if (isNaN(row.LATITUDE)) {
         errors.push(`Row ${i} LATITUDE must be a number`);
       }
+      if (isNaN(row.LONGITUDE)) {
+        errors.push(`Row ${i} LONGITUDE must be a number`);
+      }
       requiredStringCols.forEach((col) => {
         if (!row[col] || row[col].toString().trim() === "") {
           errors.push(`Row ${i} ${col} is required and cannot be empty`);
@@ -111,7 +114,7 @@ function FileUpload() {
     }
   };
 
-  // Editable table component – **must be defined here, not inside handleSubmit**
+  // Editable table component
   const EditableTable = ({ data, tableType }) => {
     if (!data || data.length === 0) return <p>No preview available</p>;
 
