@@ -72,7 +72,7 @@ function FileUpload() {
     }
 
     if (!portfolio) {
-      setPopup({ message: "Please fill the portfolio name.", type: "error" });
+      setPopup({ message: "Please enter a Portfolio Name", type: "error" });
       setTimeout(() => setPopup({ message: "", type: "success" }), 5000);
       return;
     }
